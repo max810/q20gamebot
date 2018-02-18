@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Bot.Models;
+using Hangfire;
 
 namespace Bot
 {
@@ -23,6 +24,7 @@ namespace Bot
 
             //Configuration = builder.Build();
             Configuration = configuration;
+            //RecurringJob.AddOrUpdate(() => Console.WriteLine(5), Cron.Minutely);
         }
 
         public IConfiguration Configuration { get; }

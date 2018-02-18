@@ -2,31 +2,54 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Microsoft.Extensions.Configuration;
+using Bot.Models;
+using Microsoft.Extensions.Options;
 using System.Net.Http;
 using HtmlAgilityPack;
 using System.IO;
 using System.Net;
+using Bot.Logic;
+
 
 namespace Bot.Controllers
 {
-    [Route("vpnbook")]
+    //[Produces("application/json")]
+    [Route("bot")]
     public class MainController : Controller
     {
-        //https://www.vpnbook.com/
-
-        private string password = "";
-        private DateTimeOffset lastModified = DateTime.UtcNow;
+        private string password = "error: password not set";
+        //private DateTimeOffset lastModified = DateTime.UtcNow;
         private string address = "https://www.vpnbook.com";
-        private HttpClient client = new HttpClient();
+        private HttpClient httpClient = new HttpClient();
 
-        // GET api/values
-        [HttpGet]
-        [Route("password")]
-        public async Task<string> GetPasswordAsync()
+        private BotConfig config;
+        private readonly TelegramBotClient botClient;
+
+        public MainController(IOptions<BotConfig> botConfig)
         {
-            await UpdatePassword();
-            return password;
+            config = botConfig.Value;
+            botClient = new TelegramBotClient(config.Token);
+        }
+
+        [Route("update")]
+        [HttpPost]
+        public void Post([FromBody]Update update)
+        {
+            botClient.ProcessInput(update);
+        }
+
+        private async void AddChat(long chatId)
+        {
+            using (var stream = System.IO.File.AppendText("Chats.txt"))
+            {
+                await stream.WriteLineAsync(chatId.ToString());
+            }
         }
 
         private async Task UpdatePassword()
@@ -38,7 +61,7 @@ namespace Bot.Controllers
             };
             //requestMessage.Headers.IfModifiedSince = lastModified;
 
-            using (var response = await client.SendAsync(requestMessage))
+            using (var response = await httpClient.SendAsync(requestMessage))
             {
                 if (response.StatusCode == HttpStatusCode.NotModified)
                 {
