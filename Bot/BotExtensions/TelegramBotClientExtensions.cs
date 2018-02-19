@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Bot.Models.BotCommands;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Bot.Logic
+namespace Bot.BotExtensions
 {
     public static class TelegramBotClientExtensions
     {
@@ -28,19 +30,50 @@ namespace Bot.Logic
             {
                 if (TryParseCommand(message.Text, out string command, out string args))
                 {
-                    //botClient.ProcessCommand()
+                    if (DefaultCommandCollection.Includes(command))
+                    {
+                        botClient.ProcessCommand(message, command, args);
+                    }
                 }
-                await botClient.SendTextMessageAsync(message.Chat.Id, message.Text);
+                else
+                {
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Sorry, i don't understand you");
+                }
             }
         }
-        
+
+        public static void ProcessCommand(this ITelegramBotClient botClient, Message update, string command, string args = "")
+        {
+            DefaultCommandCollection.GetAllCommands()[command].Execute(botClient, update, args);
+        }
+
+        public async static void AddChat(this ITelegramBotClient botClient, long chatId)
+        {
+            using (var stream = System.IO.File.AppendText("Chats.txt"))
+            {
+                await stream.WriteLineAsync(chatId.ToString());
+            }
+        }
+
+        public async static void DeleteChat(this ITelegramBotClient botClient, long chatId)
+        {
+            var ids = System.IO.File.ReadAllLines("Chats.txt").Where(x => x != chatId.ToString());
+            using (var stream = new StreamWriter("Chats.txt", append: false))
+            {
+                foreach (var line in ids)
+                {
+                    await stream.WriteLineAsync(line);
+                }
+            }
+        }
+
         private static bool TryParseCommand(string message, out string resultCommand, out string args)
         {
             if (!string.IsNullOrWhiteSpace(message)
                 && message.StartsWith('/'))
             {
                 int index = message.IndexOf(' ');
-                if(index == -1)
+                if (index == -1)
                 {
                     resultCommand = message;
                     args = "";

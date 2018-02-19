@@ -15,11 +15,10 @@ namespace Bot
 {
     public class Program
     {
-        private static string token = "513027360:AAHIgttJtVNz79q22IWdYd-0gUUclu7F9G8";
+        //private static string token = "513027360:AAHIgttJtVNz79q22IWdYd-0gUUclu7F9G8";
         public static void Main(string[] args)
         {
-            var client = new TelegramBotClient(token);
-            client.SetWebhookAsync("https://6b72aed0.ngrok.io/bot/update").Wait();
+            //var client = new TelegramBotClient(token);
             BuildWebHost(args).Run();
             //client.SetWebhookAsync().Wait();
         }

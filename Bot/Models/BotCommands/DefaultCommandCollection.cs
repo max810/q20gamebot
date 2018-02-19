@@ -9,8 +9,8 @@ namespace Bot.Models.BotCommands
 {
     public static class DefaultCommandCollection
     {
-        private static IReadOnlyDictionary<string, IBotCommand> allCommands;
-        public static IReadOnlyDictionary<string, IBotCommand> GetAllCommands()
+        private static IReadOnlyDictionary<string, BotCommand> allCommands;
+        public static IReadOnlyDictionary<string, BotCommand> GetAllCommands()
         {
             return allCommands;
         }
@@ -20,11 +20,13 @@ namespace Bot.Models.BotCommands
         }
         static DefaultCommandCollection()
         {
-            var dict = new Dictionary<string, IBotCommand>()
+            var dict = new Dictionary<string, BotCommand>()
             {
                 {"/start", new StartCommand()},
+                {"/help", new HelpCommand()},
+                {"/stop", new StopCommand()}
             };
-            allCommands = new ReadOnlyDictionary<string, IBotCommand>(dict);
+            allCommands = new ReadOnlyDictionary<string, BotCommand>(dict);
         }
     }
 }

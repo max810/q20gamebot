@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Microsoft.Extensions.Configuration;
 using Bot.Models;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
 using HtmlAgilityPack;
-using System.IO;
 using System.Net;
-using Bot.Logic;
+using Bot.BotExtensions;
 
 
 namespace Bot.Controllers
@@ -35,6 +30,7 @@ namespace Bot.Controllers
         {
             config = botConfig.Value;
             botClient = new TelegramBotClient(config.Token);
+            botClient.SetWebhookAsync("https://26c4ee3f.ngrok.io/bot/update").Wait();
         }
 
         [Route("update")]
@@ -42,14 +38,6 @@ namespace Bot.Controllers
         public void Post([FromBody]Update update)
         {
             botClient.ProcessInput(update);
-        }
-
-        private async void AddChat(long chatId)
-        {
-            using (var stream = System.IO.File.AppendText("Chats.txt"))
-            {
-                await stream.WriteLineAsync(chatId.ToString());
-            }
         }
 
         private async Task UpdatePassword()

@@ -8,21 +8,23 @@ using Telegram.Bot.Types;
 
 namespace Bot.Models.BotCommands
 {
-    public class StartCommand : BotCommand
+    public class StopCommand : BotCommand
     {
         public async override void Execute(ITelegramBotClient botClient, Message message = null, string args = "")
         {
             var ids = System.IO.File.ReadAllLines("Chats.txt");
             if (ids.Contains(message.Chat.Id.ToString()))
             {
+                botClient.DeleteChat(message.Chat.Id);
                 await botClient.SendTextMessageAsync(message.Chat.Id,
-                    "You're already being notified.");
+                    "Password update notifications disabled.");
             }
             else
             {
-                botClient.AddChat(message.Chat.Id);
                 await botClient.SendTextMessageAsync(message.Chat.Id,
-                    "From now on you will be notified each time a vpnbook password changes.");
+                    "You are not being notified yet."
+                    + Environment.NewLine +
+                    "To stop receiving notifications you first have to start doing it, right?");
             }
         }
     }

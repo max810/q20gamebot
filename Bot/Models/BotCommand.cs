@@ -7,8 +7,8 @@ using Telegram.Bot.Types;
 
 namespace Bot.Models
 {
-    public interface IBotCommand
+    public abstract class BotCommand
     {
-        void Execute(ITelegramBotClient botClient, Update update = null, string args="");
+        public abstract void Execute(ITelegramBotClient botClient, Message message = null, string args = "");
     }
 }
