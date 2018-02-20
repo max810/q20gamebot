@@ -12,13 +12,13 @@ namespace Bot.BotExtensions
 {
     public static class TelegramBotClientExtensions
     {
-        public static async void NotifyUsers(this ITelegramBotClient botClient, string newPassword)
+        public static async void NotifyUsers(this TelegramBotClient botClient, string newPassword)
         {
             foreach (var line in System.IO.File.ReadAllLines("Chats.txt"))
             {
                 long chatId = Convert.ToInt64(line);
                 await botClient.SendTextMessageAsync(chatId, "Password changed! New passport:");
-                await botClient.SendTextMessageAsync(chatId, $"`{newPassword}`");
+                await botClient.SendTextMessageAsync(chatId, $"`{newPassword}`", parseMode: ParseMode.Markdown);
             }
         }
 
@@ -37,7 +37,7 @@ namespace Bot.BotExtensions
                 }
                 else
                 {
-                    await botClient.SendTextMessageAsync(message.Chat.Id, "Sorry, i don't understand you");
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Sorry, i don't understand you.");
                 }
             }
         }

@@ -24,7 +24,8 @@ namespace Bot.Models.BotCommands
             {
                 {"/start", new StartCommand()},
                 {"/help", new HelpCommand()},
-                {"/stop", new StopCommand()}
+                {"/stop", new StopCommand()},
+                {"/remind", new RemindCommand()}
             };
             allCommands = new ReadOnlyDictionary<string, BotCommand>(dict);
         }

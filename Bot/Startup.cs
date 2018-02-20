@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Bot.Models;
 using Hangfire;
+using Hangfire.AspNetCore;
 
 namespace Bot
 {
@@ -24,7 +25,6 @@ namespace Bot
 
             //Configuration = builder.Build();
             Configuration = configuration;
-            //RecurringJob.AddOrUpdate(() => Console.WriteLine(5), Cron.Minutely);
         }
 
         public IConfiguration Configuration { get; }
@@ -33,6 +33,7 @@ namespace Bot
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<BotConfig>(Configuration.GetSection("Bot"));
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("HangfireConnection")));
             services.AddMvc();
         }
 
@@ -43,6 +44,7 @@ namespace Bot
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseHangfireServer();
             app.UseMvc();
         }
     }

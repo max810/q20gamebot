@@ -11,7 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "vpnbook/password",
+      "launchUrl": "bot/start",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -19,7 +19,7 @@
     "Bot": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "bot/tryget",
+      "launchUrl": "bot/start",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
