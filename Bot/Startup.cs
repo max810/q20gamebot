@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 using Bot.Models;
 using Hangfire;
 using Hangfire.AspNetCore;
+using Hangfire.PostgreSql.Annotations;
+using Hangfire.PostgreSql;
 
 namespace Bot
 {
@@ -33,7 +35,10 @@ namespace Bot
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<BotConfig>(Configuration.GetSection("Bot"));
-            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("HangfireConnection")));
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL"));
+            Console.WriteLine(Environment.NewLine);
+            services.AddHangfire(x => x.UsePostgreSqlStorage(Configuration.GetConnectionString(Environment.GetEnvironmentVariable("DATABASE_URL"))));
             services.AddMvc();
         }
 
