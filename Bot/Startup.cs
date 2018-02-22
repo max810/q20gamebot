@@ -36,9 +36,14 @@ namespace Bot
         {
             services.Configure<BotConfig>(Configuration.GetSection("Bot"));
             Console.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine("CONNECTION STRING \n");
             Console.WriteLine(Environment.GetEnvironmentVariable("DATABASE_URL"));
             Console.WriteLine(Environment.NewLine);
-            services.AddHangfire(x => x.UsePostgreSqlStorage(Configuration.GetConnectionString(Environment.GetEnvironmentVariable("DATABASE_URL"))));
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
+            services.AddHangfire(x => x.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DATABASE_URL")));
             services.AddMvc();
         }
 
