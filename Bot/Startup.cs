@@ -36,8 +36,8 @@ namespace Bot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            //dbUrl = @"postgres://xljhfbybkapuyn:c77a6062449fcc40f6673e3cd1ae07300e99b06af39c97ae0920f7e98903ef8d@ec2-184-73-202-79.compute-1.amazonaws.com:5432/df11kgfp9edh3e".Trim();
+            var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                @"postgres://xljhfbybkapuyn:c77a6062449fcc40f6673e3cd1ae07300e99b06af39c97ae0920f7e98903ef8d@ec2-184-73-202-79.compute-1.amazonaws.com:5432/df11kgfp9edh3e".Trim();
             services.Configure<BotConfig>(Configuration.GetSection("Bot"));
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine(Environment.NewLine);
