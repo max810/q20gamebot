@@ -51,6 +51,7 @@ namespace Bot.Controllers
         {
             if (!webhookSet)
             {
+                Console.WriteLine("\n\n\n\n\n" + Request.Host.ToUriComponent() + "\n\n\n\n\n");
                 botClient.SetWebhookAsync(Request.Host.ToUriComponent() + "bot/update").Wait();
                 //botClient.SetWebhookAsync(@"https://c00f1ef0.ngrok.io/bot/update").Wait();
                 webhookSet = true;
