@@ -29,7 +29,6 @@ namespace Bot.Controllers
 
         public MainController(IOptions<BotConfig> botConfig)
         {
-            //old connectionstring Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Hangfire;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False
 
             config = botConfig.Value;
             botClient = new TelegramBotClient(config.Token);

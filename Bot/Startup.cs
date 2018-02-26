@@ -15,6 +15,7 @@ using Hangfire.AspNetCore;
 using Hangfire.PostgreSql.Annotations;
 using Hangfire.PostgreSql;
 using System.Text.RegularExpressions;
+using Npgsql;
 
 namespace Bot
 {
@@ -36,6 +37,7 @@ namespace Bot
         public void ConfigureServices(IServiceCollection services)
         {
             var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            //dbUrl = @"postgres://xljhfbybkapuyn:c77a6062449fcc40f6673e3cd1ae07300e99b06af39c97ae0920f7e98903ef8d@ec2-184-73-202-79.compute-1.amazonaws.com:5432/df11kgfp9edh3e".Trim();
             services.Configure<BotConfig>(Configuration.GetSection("Bot"));
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine(Environment.NewLine);
@@ -43,18 +45,18 @@ namespace Bot
             Console.WriteLine("CONNECTION STRING \n");
             Console.WriteLine(dbUrl);
             Console.WriteLine("\n");
-            var R = new Regex(@"[a-z]+:\/\/[a-z]+:[a-z0-9]+@[a-z0-9\.-]+:[0-9]+\/[a-z0-9]+");
-            var res = R.Split(dbUrl);
-            Console.WriteLine("dbtype: {0}", res[0]);
-            Console.WriteLine("username: {0}", res[1]);
-            Console.WriteLine("pwd: {0}", res[2]);
-            Console.WriteLine("host: {0}", res[3]);
-            Console.WriteLine("port: {0}", res[4]);
-            Console.WriteLine("dname: {0}", res[5]);
+            var urlSplitter = new Regex(@"[:@(\/)]");
+            //var R = new Regex(@"[a-z]+:\/\/[a-z]+:[a-z0-9]+@[a-z0-9\.-]+:[0-9]+\/[a-z0-9]+");
+            var res = urlSplitter.Split(dbUrl).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            // ENABLE SSL
+            var connectionString = string.Format("Host={3};Port={4};Database={5};Username={1};Password={2};Pooling=true;Use SSL Stream=True;SSL Mode=Require;TrustServerCertificate=True",
+                res);
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine(Environment.NewLine);
-            services.AddHangfire(x => x.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DATABASE_URL")));
+            //services.AddHangfire(x => x.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("DATABASE_URL")));
+
+            services.AddHangfire(x => x.UsePostgreSqlStorage(connectionString));
             services.AddMvc();
         }
 
