@@ -12,7 +12,7 @@ namespace Bot.BotExtensions
 {
     public static class TelegramBotClientExtensions
     {
-        public static async void NotifyUsers(this TelegramBotClient botClient, string newPassword)
+        public static async void NotifyUsers(this ITelegramBotClient botClient, string newPassword)
         {
             foreach (var line in System.IO.File.ReadAllLines("Chats.txt"))
             {

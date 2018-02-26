@@ -10,8 +10,11 @@ using System.Net.Http;
 using HtmlAgilityPack;
 using System.Net;
 using Bot.BotExtensions;
-using Hangfire;
 using System.IO;
+using Bot.Models.Schedulers;
+using System.Threading;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Bot.Controllers
 {
@@ -24,29 +27,37 @@ namespace Bot.Controllers
         private HttpClient httpClient = new HttpClient();
 
         private BotConfig config;
-        private readonly TelegramBotClient botClient;
-        private event Action<string> Notify;
+        private static TelegramBotClient botClient = null;
+        //private static event Action<string> Notify;
+        private static bool webhookSet = false;
 
-        public MainController(IOptions<BotConfig> botConfig)
+        public MainController(IOptions<BotConfig> botConfig, PasswordUpdateHostedService service)
         {
-
             config = botConfig.Value;
-            botClient = new TelegramBotClient(config.Token);
-            botClient.SetWebhookAsync("https://26c4ee3f.ngrok.io/bot/update").Wait();
-            //using (var server = new BackgroundJobServer())
-            //{
-            RecurringJob.AddOrUpdate(() => UpdatePassword(), Cron.Minutely);
-            //RecurringJob.AddOrUpdate(() => botClient.NotifyUsers("testRecurring"), Cron.Minutely);
-            //}
-            //botClient.NotifyUsers("test").Wait();
-            Notify += (pwd) => botClient.NotifyUsers(pwd);
+            if(botClient == null)
+            {
+                botClient = new TelegramBotClient(config.Token);
+            }
+            if (service.PasswordProcessorDelegate == null)
+            {
+                service.PasswordProcessorDelegate = (pwd => botClient.NotifyUsers(pwd));
+                service.StartAsync(CancellationToken.None);
+            }
         }
 
         [Route("start")]
         [HttpGet]
         public string StartBot()
         {
-            return "bot started";
+            if (!webhookSet)
+            {
+                botClient.SetWebhookAsync(Request.Host.ToUriComponent()).Wait();
+                //botClient.SetWebhookAsync(@"https://c00f1ef0.ngrok.io/bot/update").Wait();
+                webhookSet = true;
+                return "bot launched";
+            }
+            
+            return "bot is working";
         }
 
         [Route("update")]
@@ -54,59 +65,6 @@ namespace Bot.Controllers
         public void Post([FromBody]Update update)
         {
             botClient.ProcessInput(update);
-        }
-
-        public async Task UpdatePassword()
-        {
-            var requestMessage = new HttpRequestMessage()
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(address)
-            };
-            //requestMessage.Headers.IfModifiedSince = lastModified;
-
-            using (var response = await httpClient.SendAsync(requestMessage))
-            {
-                if (response.StatusCode == HttpStatusCode.NotModified)
-                {
-                    return;
-                }
-
-                response.EnsureSuccessStatusCode();
-
-                //lastModified = response.Content.Headers.LastModified.Value;
-                using (var content = response.Content)
-                {
-                    string body = await content.ReadAsStringAsync();
-                    HtmlDocument document = new HtmlDocument();
-                    document.LoadHtml(body);
-                    var newPassword = ParsePassword(document);
-                    string oldPassword;
-                    using(var stream = new StreamReader("Password.txt"))
-                    {
-                        oldPassword = await stream.ReadLineAsync();
-                    }
-                    if (oldPassword == newPassword)
-                    {
-                        Notify("fail");
-                    }
-                    else
-                    {
-                        using (var stream = new StreamWriter("Password.txt", append: false))
-                        {
-                            stream.WriteLine(newPassword);
-                        }
-                        Notify(newPassword);
-                    }
-                }
-            }
-        }
-
-        private string ParsePassword(HtmlDocument document)
-        {
-            var strongNodes = document.DocumentNode.SelectNodes("//strong");
-            string password = strongNodes.Last().InnerText.Split(':').Last().Trim();
-            return password;
         }
     }
 }
