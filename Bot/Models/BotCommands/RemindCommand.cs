@@ -14,7 +14,7 @@ namespace Bot.Models.BotCommands
         public async override void Execute(ITelegramBotClient botClient, Message message = null, string args = "")
         {
             string pwd;
-            using(var stream = new StreamReader("Password.txt"))
+            using(var stream = new StreamReader("Bot/Password.txt"))
             {
                 pwd = await stream.ReadLineAsync();
             }
