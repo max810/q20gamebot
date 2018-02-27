@@ -14,7 +14,7 @@ namespace Bot.BotExtensions
     {
         public static async void NotifyUsers(this ITelegramBotClient botClient, string newPassword)
         {
-            foreach (var line in System.IO.File.ReadAllLines("Chats.txt"))
+            foreach (var line in System.IO.File.ReadAllLines("Bot/Chats.txt"))
             {
                 long chatId = Convert.ToInt64(line);
                 await botClient.SendTextMessageAsync(chatId, "Password changed! New passport:");
@@ -49,7 +49,7 @@ namespace Bot.BotExtensions
 
         public async static void AddChat(this ITelegramBotClient botClient, long chatId)
         {
-            using (var stream = System.IO.File.AppendText("Chats.txt"))
+            using (var stream = System.IO.File.AppendText("Bot/Chats.txt"))
             {
                 await stream.WriteLineAsync(chatId.ToString());
             }
@@ -57,8 +57,8 @@ namespace Bot.BotExtensions
 
         public async static void DeleteChat(this ITelegramBotClient botClient, long chatId)
         {
-            var ids = System.IO.File.ReadAllLines("Chats.txt").Where(x => x != chatId.ToString());
-            using (var stream = new StreamWriter("Chats.txt", append: false))
+            var ids = System.IO.File.ReadAllLines("Bot/Chats.txt").Where(x => x != chatId.ToString());
+            using (var stream = new StreamWriter("Bot/Chats.txt", append: false))
             {
                 foreach (var line in ids)
                 {
