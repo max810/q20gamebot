@@ -31,10 +31,6 @@ namespace Bot.Models.Schedulers
                 {
                     PasswordProcessorDelegate?.Invoke(passwordUpdateProvider.Password);
                 }
-                else
-                {
-                    PasswordProcessorDelegate?.Invoke("test");
-                }
                 await Task.Delay(TimeSpan.FromMinutes(10), token);
             }
         }
