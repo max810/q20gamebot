@@ -22,23 +22,11 @@ namespace Bot.Controllers
     [Route("vpnbot")]
     public class VpnBotController : BotController
     {
+        private PasswordUpdateHostedService passwordUpdateService;
+
         public VpnBotController(IOptions<BotConfig> botConfig, PasswordUpdateHostedService service) : base(botConfig)
-        { 
-            if (service.PasswordProcessorDelegate == null)
-            {
-                service.PasswordProcessorDelegate = (pwd =>
-                {
-                    BotClient.NotifyUsers(pwd);
-                    using (var client = new HttpClient())
-                    {
-                        using (var message = new HttpRequestMessage(HttpMethod.Get, CurrentHostUri))
-                        {
-                            client.SendAsync(message).Wait();
-                        } 
-                    }
-                });
-                service.StartAsync(CancellationToken.None);
-            }
+        {
+            passwordUpdateService = service;
         }
 
         [Route("start")]
@@ -55,6 +43,22 @@ namespace Bot.Controllers
                 uri += "/vpnbot/update";
                 SetBotWebhook(uri);
                 return "bot launched";
+            }
+
+            if (passwordUpdateService.PasswordProcessorDelegate == null)
+            {
+                passwordUpdateService.PasswordProcessorDelegate = (pwd =>
+                {
+                    BotClient.NotifyUsers(pwd);
+                    using (var client = new HttpClient())
+                    {
+                        using (var message = new HttpRequestMessage(HttpMethod.Get, CurrentHostUri))
+                        {
+                            client.SendAsync(message).Wait();
+                        }
+                    }
+                });
+                passwordUpdateService.StartAsync(CancellationToken.None);
             }
 
             return "bot is working";
