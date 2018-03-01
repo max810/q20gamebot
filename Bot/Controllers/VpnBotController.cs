@@ -32,6 +32,7 @@ namespace Bot.Controllers
         [Route("start")]
         public string Start()
         {
+            string result = "";
             if (CurrentHostUri == null)
             {
                 var host = Request.Host;
@@ -42,7 +43,11 @@ namespace Bot.Controllers
                 }
                 uri += "/vpnbot/update";
                 SetBotWebhook(uri);
-                return "bot launched";
+                result = "bot launched";
+            }
+            else
+            {
+                result = "bot is working";
             }
 
             if (passwordUpdateService.PasswordProcessorDelegate == null)
@@ -61,7 +66,7 @@ namespace Bot.Controllers
                 passwordUpdateService.StartAsync(CancellationToken.None);
             }
 
-            return "bot is working";
+            return result;
         }
 
         [Route("update")]
