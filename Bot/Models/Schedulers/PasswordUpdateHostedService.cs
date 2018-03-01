@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
-using Bot.BotExtensions;
+using Bot.VpnBotExtensions;
 using System.Net.Http;
 using Bot.Controllers;
 
@@ -30,13 +30,6 @@ namespace Bot.Models.Schedulers
                 if (passwordUpdateProvider.Password != oldpwd)
                 {
                     PasswordProcessorDelegate?.Invoke(passwordUpdateProvider.Password);
-                }
-                using(var client = new HttpClient())
-                {
-                    using(var message = new HttpRequestMessage(HttpMethod.Get, MainController.currentHost))
-                    {
-                        await client.SendAsync(message);
-                    }
                 }
                 await Task.Delay(TimeSpan.FromMinutes(10), token);
             }

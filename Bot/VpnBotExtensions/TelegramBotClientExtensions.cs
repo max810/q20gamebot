@@ -8,7 +8,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Bot.BotExtensions
+namespace Bot.VpnBotExtensions
 {
     public static class TelegramBotClientExtensions
     {
