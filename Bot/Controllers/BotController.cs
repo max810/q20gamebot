@@ -38,8 +38,6 @@ namespace Bot.Controllers
             BotClient.SetWebhookAsync(uri).Wait();
         }
 
-        [Route("update")]
-        [HttpPost]
         public abstract void Post([FromBody]Update update);
     }
 }

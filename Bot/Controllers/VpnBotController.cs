@@ -53,7 +53,6 @@ namespace Bot.Controllers
                     uri = "https://" + uri;
                 }
                 uri += "/vpnbot/update";
-                uri = "https://c00f1ef0.ngrok.io";
                 SetBotWebhook(uri);
                 return "bot launched";
             }
