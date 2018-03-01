@@ -26,15 +26,15 @@ namespace Bot.Controllers
         { 
             if (service.PasswordProcessorDelegate == null)
             {
-                service.PasswordProcessorDelegate = (async pwd =>
+                service.PasswordProcessorDelegate = (pwd =>
                 {
                     BotClient.NotifyUsers(pwd);
                     using (var client = new HttpClient())
                     {
                         using (var message = new HttpRequestMessage(HttpMethod.Get, CurrentHostUri))
                         {
-                            await client.SendAsync(message);
-                        }
+                            client.SendAsync(message).Wait();
+                        } 
                     }
                 });
                 service.StartAsync(CancellationToken.None);

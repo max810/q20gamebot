@@ -21,7 +21,7 @@ namespace Bot.Controllers
         protected HttpClient GetHttpClient { get; } = new HttpClient();
         protected BotConfig GetBotConfig { get; }
         protected static ITelegramBotClient BotClient { get; private set; }
-        protected string CurrentHostUri { get; private set; }
+        protected static string CurrentHostUri { get; private set; }
 
         public BotController(IOptions<BotConfig> config)
         {

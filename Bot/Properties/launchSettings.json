@@ -11,7 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "bot/start",
+      "launchUrl": "vpnbot/start",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -19,7 +19,7 @@
     "Bot": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "bot/start",
+      "launchUrl": "vpnbot/start",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

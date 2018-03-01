@@ -42,7 +42,7 @@ namespace Bot
                 app.UseDeveloperExceptionPage();
             }
             app.UseMvc(x => x.MapRoute("default", 
-                "{controller=bot}/{action=start}/{id?}"));
+                "{controller=vpnbot}/{action=start}"));
         }
     }
 }
