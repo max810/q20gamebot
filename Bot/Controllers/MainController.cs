@@ -30,6 +30,7 @@ namespace Bot.Controllers
         private static TelegramBotClient botClient = null;
         //private static event Action<string> Notify;
         private static bool webhookSet = false;
+        public static string currentHost = "";
 
         public MainController(IOptions<BotConfig> botConfig, PasswordUpdateHostedService service)
         {
@@ -49,13 +50,17 @@ namespace Bot.Controllers
         [HttpGet]
         public string StartBot()
         {
+            if (string.IsNullOrWhiteSpace(currentHost))
+            {
+                currentHost = "https://" + Request.Host.ToUriComponent();
+            }
             if (!webhookSet)
             {
                 //Console.WriteLine("\n\n\n\n\n" + Request.Host.ToUriComponent() + "\n\n\n\n\n");
-                botClient.SetWebhookAsync(Request.Host.ToUriComponent() + "/bot/update").Wait();
+                botClient.SetWebhookAsync(currentHost + "/bot/update").Wait();
                 //botClient.SetWebhookAsync(@"https://c00f1ef0.ngrok.io/bot/update").Wait();
                 webhookSet = true;
-                return "bot launched";
+                return "bot launched)";
             }
             
             return "bot is working";

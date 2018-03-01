@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Bot.BotExtensions;
+using System.Net.Http;
+using Bot.Controllers;
 
 namespace Bot.Models.Schedulers
 {
@@ -29,7 +31,14 @@ namespace Bot.Models.Schedulers
                 {
                     PasswordProcessorDelegate?.Invoke(passwordUpdateProvider.Password);
                 }
-                await Task.Delay(TimeSpan.FromMinutes(5), token);
+                using(var client = new HttpClient())
+                {
+                    using(var message = new HttpRequestMessage(HttpMethod.Get, MainController.currentHost))
+                    {
+                        await client.SendAsync(message);
+                    }
+                }
+                await Task.Delay(TimeSpan.FromMinutes(10), token);
             }
         }
     }

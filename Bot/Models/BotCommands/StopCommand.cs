@@ -12,7 +12,7 @@ namespace Bot.Models.BotCommands
     {
         public async override void Execute(ITelegramBotClient botClient, Message message = null, string args = "")
         {
-            var ids = System.IO.File.ReadAllLines("../Bot/Chats.txt");
+            var ids = System.IO.File.ReadAllLines("Files/Chats.txt");
             if (ids.Contains(message.Chat.Id.ToString()))
             {
                 botClient.DeleteChat(message.Chat.Id);

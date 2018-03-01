@@ -48,7 +48,7 @@ namespace Bot.Models
                     Password = newPassword;
 
                     string oldPassword;
-                    using (var stream = new StreamReader("../Bot/Password.txt"))
+                    using (var stream = new StreamReader("Files/Password.txt"))
                     {
                         oldPassword = await stream.ReadLineAsync();
                     }
@@ -58,7 +58,7 @@ namespace Bot.Models
                     }
                     else
                     {
-                        using (var stream = new StreamWriter("../Bot/Password.txt", append: false))
+                        using (var stream = new StreamWriter("Files/Password.txt", append: false))
                         {
                             stream.WriteLine(newPassword);
                         }
