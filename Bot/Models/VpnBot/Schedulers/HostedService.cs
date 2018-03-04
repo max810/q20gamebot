@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bot.Models.Schedulers
+namespace Bot.Models.VpnBot.Schedulers
 {
     public abstract class HostedService: IHostedService
     {

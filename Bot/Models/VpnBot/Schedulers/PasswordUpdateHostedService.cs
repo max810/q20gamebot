@@ -8,8 +8,9 @@ using Telegram.Bot;
 using Bot.VpnBotExtensions;
 using System.Net.Http;
 using Bot.Controllers;
+using Bot.VpnBot.Models;
 
-namespace Bot.Models.Schedulers
+namespace Bot.Models.VpnBot.Schedulers
 {
     public class PasswordUpdateHostedService : HostedService
     {

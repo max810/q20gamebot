@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace Bot.Models.BotCommands
-{
+namespace Bot.Models.VpnBot.Commands
+{ 
     public class RemindCommand: BotCommand
     {
         public async override void Execute(ITelegramBotClient botClient, Message message = null, string args = "")

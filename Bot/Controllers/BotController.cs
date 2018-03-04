@@ -10,7 +10,6 @@ using System.Net.Http;
 using HtmlAgilityPack;
 using System.Net;
 using System.IO;
-using Bot.Models.Schedulers;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

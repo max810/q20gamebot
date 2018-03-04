@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace Bot.Models.BotCommands
+namespace Bot.Models.VpnBot.Commands
 {
     public class HelpCommand : BotCommand
     {
@@ -32,7 +30,7 @@ Here's the list of all commands:
                 {
                     args = "/" + args;
                 }
-                if (DefaultCommandCollection.Includes(args))
+                if (VpnBotCommandCollection.Includes(args))
                 {
                     reply =
                         $"Info about command \"{args}\"{Environment.NewLine + Environment.NewLine}"
@@ -55,7 +53,7 @@ Here's the list of all commands:
             {"/stop", "Stop receiving password update notifications. This bot will no longer send you any messages."
             + Environment.NewLine +
                 "You can start receiving them again by simply typing /start command."},
-            {"/remind", "Get the current password (in casw you have forgotten it)."}
+            {"/remind", "Get the current password (in case you have forgotten it)."}
         };
     }
 }

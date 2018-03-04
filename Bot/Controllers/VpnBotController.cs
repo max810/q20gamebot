@@ -11,10 +11,11 @@ using HtmlAgilityPack;
 using System.Net;
 using Bot.VpnBotExtensions;
 using System.IO;
-using Bot.Models.Schedulers;
+using Bot.Models.VpnBot.Schedulers;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Bot.Models.BotConfigs;
 
 namespace Bot.Controllers
 {
@@ -24,7 +25,7 @@ namespace Bot.Controllers
     {
         private PasswordUpdateHostedService passwordUpdateService;
 
-        public VpnBotController(IOptions<BotConfig> botConfig, PasswordUpdateHostedService service) : base(botConfig)
+        public VpnBotController(IOptions<VpnBotConfig> botConfig, PasswordUpdateHostedService service) : base(botConfig)
         {
             passwordUpdateService = service;
         }

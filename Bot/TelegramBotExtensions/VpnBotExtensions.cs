@@ -1,16 +1,14 @@
-﻿using Bot.Models.BotCommands;
+﻿using Bot.Models.VpnBot.Commands;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace Bot.VpnBotExtensions
 {
-    public static class TelegramBotClientExtensions
+    public static class VpnBotExtensions
     {
         public static async void NotifyUsers(this ITelegramBotClient botClient, string newPassword)
         {
@@ -28,9 +26,9 @@ namespace Bot.VpnBotExtensions
             var message = update.Message;
             if (message?.Type == MessageType.TextMessage)
             {
-                if (TryParseCommand(message.Text, out string command, out string args))
+                if (BotTools.TryParseCommand(message.Text, out string command, out string args))
                 {
-                    if (DefaultCommandCollection.Includes(command))
+                    if (VpnBotCommandCollection.Includes(command))
                     {
                         botClient.ProcessCommand(message, command, args);
                     }
@@ -44,7 +42,7 @@ namespace Bot.VpnBotExtensions
 
         public static void ProcessCommand(this ITelegramBotClient botClient, Message update, string command, string args = "")
         {
-            DefaultCommandCollection.GetAllCommands()[command].Execute(botClient, update, args);
+            VpnBotCommandCollection.GetAllCommands()[command].Execute(botClient, update, args);
         }
 
         public async static void AddChat(this ITelegramBotClient botClient, long chatId)
@@ -65,29 +63,6 @@ namespace Bot.VpnBotExtensions
                     await stream.WriteLineAsync(line);
                 }
             }
-        }
-
-        private static bool TryParseCommand(string message, out string resultCommand, out string args)
-        {
-            if (!string.IsNullOrWhiteSpace(message)
-                && message.StartsWith('/'))
-            {
-                int index = message.IndexOf(' ');
-                if (index == -1)
-                {
-                    resultCommand = message;
-                    args = "";
-                }
-                else
-                {
-                    resultCommand = message.Substring(0, index);
-                    args = message.Substring(index + 1);
-                }
-                return true;
-            }
-            resultCommand = null;
-            args = null;
-            return false;
         }
     }
 }

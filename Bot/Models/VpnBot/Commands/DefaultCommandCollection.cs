@@ -1,13 +1,9 @@
-﻿using Bot.Models.BotCommands;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Bot.Models.BotCommands
+namespace Bot.Models.VpnBot.Commands
 {
-    public static class DefaultCommandCollection
+    public static class VpnBotCommandCollection
     {
         private static IReadOnlyDictionary<string, BotCommand> allCommands;
         public static IReadOnlyDictionary<string, BotCommand> GetAllCommands()
@@ -18,7 +14,7 @@ namespace Bot.Models.BotCommands
         {
             return allCommands.ContainsKey(command);
         }
-        static DefaultCommandCollection()
+        static VpnBotCommandCollection()
         {
             var dict = new Dictionary<string, BotCommand>()
             {

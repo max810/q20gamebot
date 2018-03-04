@@ -1,12 +1,9 @@
 ﻿using Bot.VpnBotExtensions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace Bot.Models.BotCommands
+namespace Bot.Models.VpnBot.Commands
 {
     public class StartCommand : BotCommand
     {

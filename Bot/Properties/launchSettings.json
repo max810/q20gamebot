@@ -19,7 +19,7 @@
     "Bot": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "vpnbot/start",
+      "launchUrl": "q20gamebot/start",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
