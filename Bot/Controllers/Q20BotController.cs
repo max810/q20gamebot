@@ -49,35 +49,33 @@ namespace Bot.Controllers
         }
 
         [Route("update")]
-        public async override void Post([FromBody] Update update)
+        public override async void Post([FromBody] Update update)
         {
-
             var message = update.Message;
-            ResolveAndExecute(message);
-
-            await BotClient.SendTextMessageAsync(message.Chat.Id, "sadfvf",
-                replyMarkup: Q20GameBotKeyboards.AnswerKeyboard,
-                parseMode: ParseMode.Markdown);
+            await ResolveAndExecute(message);
         }
 
-        private async void ResolveAndExecute(Message message)
+        private async Task ResolveAndExecute(Message message)
         {
-            var messageText = new string(message.Text.Where(x => !char.IsSymbol(x)).ToArray());
+            var messageText = new string(message.Text.Where(x => !char.IsSymbol(x)).ToArray()).Trim();
 
             var currentSession = context.Sessions.FirstOrDefault(x => x.ChatId == message.Chat.Id);
 
             if (currentSession == null)
             {
-                if (string.Equals(messageText, Q20GameBotKeywords.StartKeyword))
+                if (string.Equals(messageText, Q20GameBotKeywords.StartKeyword, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    StartGame();
                     context.Sessions.Add(new Session()
                     {
                         ChatId = message.Chat.Id,
                         LastRequestMade = DateTime.Now,
-                        CurrentAddress = GetNewGameAddress()
+                        CurrentAddress = null
                     });
                     await BotClient.SendTextMessageAsync(message.Chat.Id, Q20GameBotMessages.GameStartMessage);
+                    await BotClient.SendTextMessageAsync(message.Chat.Id, "Choose category", 
+                        replyMarkup: Q20GameBotKeyboards.ChooseCategoryKeyboard);
+
+                    await context.SaveChangesAsync();
                 }
                 else
                 {
@@ -90,24 +88,39 @@ namespace Bot.Controllers
 
             if (string.Equals(messageText, Q20GameBotKeywords.ExitKeywoard, StringComparison.InvariantCultureIgnoreCase))
             {
+                context.Sessions.Remove(currentSession);
                 await BotClient.SendTextMessageAsync(message.Chat.Id,
                     Q20GameBotMessages.ExitMessage);
 
+                await context.SaveChangesAsync();
 
                 return;
             }
 
             if (DateTime.Now - currentSession.LastRequestMade > TimeSpan.FromMinutes(20))
             {
+                context.Sessions.Remove(currentSession);
                 await BotClient.SendTextMessageAsync(message.Chat.Id,
                     Q20GameBotMessages.SessionExpiredMessage);
 
+                await context.SaveChangesAsync();
 
                 return;
             }
 
-            var currentPage = await Q20GameBotTools.GetGamePage(currentSession.CurrentAddress);
-            var currentState = Q20GameBotTools.ResolveGameState(currentPage);
+            HtmlDocument currentPage;
+            Q20GameState currentState;
+
+            if(currentSession.CurrentAddress == null)
+            {
+                currentPage = await Q20GameBotTools.GetNewGamePageAsync();
+                currentState = Q20GameState.CategoryChoice;
+            }
+            else
+            {
+                currentPage = await Q20GameBotTools.GetGamePageAsync(currentSession.CurrentAddress);
+                currentState = Q20GameBotTools.ResolveGameState(currentPage);
+            }
 
             try
             {
@@ -118,36 +131,19 @@ namespace Bot.Controllers
                 await BotClient.SendTextMessageAsync(message.Chat.Id, Q20GameBotMessages.NotUnderstoodMessage);
             }
 
-            
-
-            string replyMessage;
-            ReplyKeyboardMarkup keyboard;
-
             string nextUri = Q20GameBotTools.GetNextUri(currentPage, messageText);
+            currentSession.CurrentAddress = nextUri;
+            var nextGamePage = await Q20GameBotTools.GetGamePageAsync(nextUri);
+            var nextGamePageState = Q20GameBotTools.ResolveGameState(nextGamePage);
 
-            //ResolveCommand(messageText);
-            //TODO
+            string replyMessage = Q20GameBotTools.GetMessage(nextGamePage, nextGamePageState);
 
-            throw new NotImplementedException("Corresponding keyboards, add messages, ask questions");
+            await BotClient.SendTextMessageAsync(message.Chat.Id, replyMessage, 
+                replyMarkup: Correspondance.CorrespondingKeyboards[nextGamePageState]);
+            currentSession.LastRequestMade = DateTime.Now;
 
-
+            await context.SaveChangesAsync();
         }
-
-        private void ResolveCommand(string messageText)
-        {
-            throw new NotImplementedException();
-        }
-
-        private string GetNewGameAddress()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void StartGame()
-        {
-            throw new NotImplementedException();
-        }
-
 
     }
 }

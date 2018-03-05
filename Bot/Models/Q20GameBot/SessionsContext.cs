@@ -23,7 +23,7 @@ namespace Bot.Q20GameBot.Models
                 entity.Property(e => e.ChatId).ValueGeneratedNever();
 
                 entity.Property(e => e.CurrentAddress)
-                    .IsRequired()
+                    //.IsRequired()
                     .HasMaxLength(100)
                     .IsUnicode(false);
 

@@ -54,7 +54,7 @@ namespace Bot.Models.Q20GameBot
             }
         }
 
-        public async static Task<HtmlDocument> GetGamePage(string currentAddress)
+        public async static Task<HtmlDocument> GetGamePageAsync(string currentAddress)
         {
             HtmlDocument gamePage = new HtmlDocument();
             HttpRequestMessage requestMessage = new HttpRequestMessage()
@@ -86,6 +86,42 @@ namespace Bot.Models.Q20GameBot
             string uri = a.GetAttributeValue("href", def: null);
             uri = "http://y.20q.net" + uri;
             return uri;
+        }
+
+        public static string GetMessage(HtmlDocument currentPage)
+        {
+            return GetMessage(currentPage, ResolveGameState(currentPage));
+        }
+
+        public static string GetMessage(HtmlDocument currentPage, Q20GameState gameState)
+        {
+            if(gameState == Q20GameState.GameFinish)
+            {
+                return currentPage.DocumentNode.SelectNodes("//h2").First().InnerText;
+            }
+
+            return currentPage.DocumentNode.SelectNodes("//td/big/b").First().FirstChild.InnerText;
+        }
+
+        public async static Task<HtmlDocument> GetNewGamePageAsync()
+        {
+            var startingPage = await GetGamePageAsync("http://y.20q.net/gsq-en");
+            var gameStartUri = startingPage.DocumentNode
+                .SelectSingleNode("//form")
+                .GetAttributeValue("action", def: null);
+            gameStartUri = "http://y.20q.net" + gameStartUri;
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, gameStartUri);
+            HtmlDocument newGamePage = new HtmlDocument();
+            using(var response = await client.SendAsync(requestMessage))
+            {
+                using(var content = response.Content)
+                {
+                    string body = await content.ReadAsStringAsync();
+                    newGamePage.LoadHtml(body);
+                }
+            }
+
+            return newGamePage;
         }
     }
 }
