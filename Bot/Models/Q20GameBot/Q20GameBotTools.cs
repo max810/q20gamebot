@@ -20,9 +20,13 @@ namespace Bot.Models.Q20GameBot
                 return Q20GameState.GameFinish;
             }
             var question = gamePage.DocumentNode.SelectNodes("//td/big/b").First().InnerText.ToLowerInvariant();
-            //not necessary
-            //var answers = gamePage.DocumentNode.SelectNodes("//td/big/b/nobr").First().ChildNodes;
-            if (new Regex(@"^(q[2-9]\.|q[1-2][0-9]\.|q30\.)").IsMatch(question))
+
+            if (question.Contains("classified as"))
+            {
+                return Q20GameState.CategoryChoice;
+            }
+
+            if (new Regex(@"^(q[1-9]\.|q[1-2][0-9]\.|q30\.)").IsMatch(question))
             {
                 if (question.Contains("guessing"))
                 {
@@ -34,12 +38,6 @@ namespace Bot.Models.Q20GameBot
                 }
             }
 
-            if (question.StartsWith("q1"))
-            // || questionText.Contains("is it classified as") not necessary
-            {
-                return Q20GameState.CategoryChoice;
-            }
-            
 
             throw new ArgumentException("Uknown game page type");
         }
