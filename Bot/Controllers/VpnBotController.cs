@@ -72,7 +72,7 @@ namespace Bot.Controllers
 
         [Route("update")]
         [HttpPost]
-        public override void Post([FromBody]Update update)
+        public void Post([FromBody]Update update)
         {
             BotClient.ProcessInput(update);
         }

@@ -22,6 +22,7 @@ namespace Bot.Models.Q20GameBot
                 {Q20GameState.CategoryChoice, Q20GameBotKeyboards.ChooseCategoryKeyboard},
                 {Q20GameState.AnswerPending, Q20GameBotKeyboards.AnswerKeyboard },
                 {Q20GameState.GuessConfirmation, Q20GameBotKeyboards.GuessKeyboard },
+                {Q20GameState.GameFinish, Q20GameBotKeyboards.GameFinishKeyboard }
             };
     }
 }

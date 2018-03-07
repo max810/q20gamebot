@@ -22,11 +22,6 @@ namespace Bot.Q20GameBot.Models
 
                 entity.Property(e => e.ChatId).ValueGeneratedNever();
 
-                entity.Property(e => e.CurrentAddress)
-                    //.IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.LastRequestMade).HasColumnType("datetime");
             });
         }

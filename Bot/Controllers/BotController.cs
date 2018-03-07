@@ -37,6 +37,6 @@ namespace Bot.Controllers
             BotClient.SetWebhookAsync(uri).Wait();
         }
 
-        public abstract void Post([FromBody]Update update);
+        //public abstract Task Post([FromBody]Update update);
     }
 }

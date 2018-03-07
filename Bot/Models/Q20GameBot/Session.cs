@@ -7,6 +7,5 @@ namespace Bot.Q20GameBot.Models
     {
         public long ChatId { get; set; }
         public DateTime LastRequestMade { get; set; }
-        public string CurrentAddress { get; set; }
     }
 }

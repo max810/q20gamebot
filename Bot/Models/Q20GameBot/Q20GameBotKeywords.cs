@@ -16,7 +16,10 @@ namespace Bot.Models.Q20GameBot
         public static IEnumerable<string> GuessKeywoards =>
             new string[] { "Right", "Wrong" };
 
-        public static string StartKeyword => "Start";
+        public static IEnumerable<string> StartKeywords => 
+            new string[] { "Start", "Play again", "/start" };
+
         public static string ExitKeywoard => "EXIT";
+        public static string GameFinishKeywords => "Play again";
     }
 }

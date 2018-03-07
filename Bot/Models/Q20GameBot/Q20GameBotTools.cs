@@ -14,25 +14,17 @@ namespace Bot.Models.Q20GameBot
 
         public static Q20GameState ResolveGameState(HtmlDocument gamePage)
         {
-            if (gamePage.DocumentNode.SelectNodes("//h2").FirstOrDefault()
-                ?.InnerText.ToLower().Contains("won") == true)
+            var h2Nodes = gamePage.DocumentNode.SelectNodes("//h2");
+            if (h2Nodes != null && h2Nodes.First().InnerText.Contains(" won"))
             {
                 return Q20GameState.GameFinish;
             }
-            var question = gamePage.DocumentNode.SelectNodes("//td/big/b").First().FirstChild;
+            var question = gamePage.DocumentNode.SelectNodes("//td/big/b").First().InnerText.ToLowerInvariant();
             //not necessary
             //var answers = gamePage.DocumentNode.SelectNodes("//td/big/b/nobr").First().ChildNodes;
-
-            var questionText = question.InnerText.ToLowerInvariant();
-
-            if (questionText.StartsWith("q1"))
-            // || questionText.Contains("is it classified as") not necessary
+            if (new Regex(@"^(q[2-9]\.|q[1-2][0-9]\.|q30\.)").IsMatch(question))
             {
-                return Q20GameState.CategoryChoice;
-            }
-            if (new Regex(@"^(q[2-9]\.|q[1-2][0-9]\.|q30\.)").IsMatch(questionText))
-            {
-                if (questionText.Contains("i am guessing"))
+                if (question.Contains("guessing"))
                 {
                     return Q20GameState.GuessConfirmation;
                 }
@@ -41,6 +33,13 @@ namespace Bot.Models.Q20GameBot
                     return Q20GameState.AnswerPending;
                 }
             }
+
+            if (question.StartsWith("q1"))
+            // || questionText.Contains("is it classified as") not necessary
+            {
+                return Q20GameState.CategoryChoice;
+            }
+            
 
             throw new ArgumentException("Uknown game page type");
         }
@@ -54,14 +53,18 @@ namespace Bot.Models.Q20GameBot
             }
         }
 
-        public async static Task<HtmlDocument> GetGamePageAsync(string currentAddress)
+        public async static Task<HtmlDocument> GetGamePageAsync(string currentAddress, string referer = null)
         {
             HtmlDocument gamePage = new HtmlDocument();
             HttpRequestMessage requestMessage = new HttpRequestMessage()
             {
                 RequestUri = new Uri(currentAddress),
-                Method = HttpMethod.Get
+                Method = HttpMethod.Post
             };
+            if (referer != null)
+            {
+                requestMessage.Headers.Referrer = new Uri(referer);
+            }
 
             using (var response = await client.SendAsync(requestMessage))
             {
@@ -80,39 +83,43 @@ namespace Bot.Models.Q20GameBot
 
         public static string GetNextUri(HtmlDocument currentPage, string messageText)
         {
-            var a = currentPage.DocumentNode.Descendants("a").Where(x =>
-                string.Equals(messageText, x.InnerText, StringComparison.InvariantCultureIgnoreCase)).First();
+            var a = currentPage.DocumentNode.SelectNodes("//a").Where(x =>
+                string.Equals(messageText, HtmlEntity.DeEntitize(x.InnerText).Trim(), 
+                StringComparison.InvariantCultureIgnoreCase))
+                .First();
 
             string uri = a.GetAttributeValue("href", def: null);
             uri = "http://y.20q.net" + uri;
             return uri;
         }
 
-        public static string GetMessage(HtmlDocument currentPage)
-        {
-            return GetMessage(currentPage, ResolveGameState(currentPage));
-        }
-
-        public static string GetMessage(HtmlDocument currentPage, Q20GameState gameState)
-        {
-            if(gameState == Q20GameState.GameFinish)
-            {
-                return currentPage.DocumentNode.SelectNodes("//h2").First().InnerText;
-            }
-
-            return currentPage.DocumentNode.SelectNodes("//td/big/b").First().FirstChild.InnerText;
-        }
-
         public async static Task<HtmlDocument> GetNewGamePageAsync()
         {
-            var startingPage = await GetGamePageAsync("http://y.20q.net/gsq-en");
+            HtmlDocument startingPage = new HtmlDocument();
+
+            var startingPageRequestMessage = new HttpRequestMessage(HttpMethod.Get, "http://y.20q.net/gsq-en");
+            startingPageRequestMessage.Headers.Referrer = new Uri("http://www.20q.net/flat/play.html");
+
+            using(var response = await client.SendAsync(startingPageRequestMessage))
+            {
+                using(var content = response.Content)
+                {
+                    string body = await content.ReadAsStringAsync();
+                    startingPage.LoadHtml(body);
+                }
+            }
+
             var gameStartUri = startingPage.DocumentNode
                 .SelectSingleNode("//form")
                 .GetAttributeValue("action", def: null);
             gameStartUri = "http://y.20q.net" + gameStartUri;
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, gameStartUri);
+            var newGameRequestMessage = new HttpRequestMessage(HttpMethod.Post, gameStartUri);
+            newGameRequestMessage.Headers.Referrer = new Uri("http://y.20q.net/gsq-en");
+            newGameRequestMessage.Headers.Add("Origin", "http://y.20q.net");
+            newGameRequestMessage.Content = new StringContent("age=&cctkr=UA%2CHR%2CRU%2CSK%2CPL&submit=++Play++");
+
             HtmlDocument newGamePage = new HtmlDocument();
-            using(var response = await client.SendAsync(requestMessage))
+            using(var response = await client.SendAsync(newGameRequestMessage))
             {
                 using(var content = response.Content)
                 {
@@ -122,6 +129,19 @@ namespace Bot.Models.Q20GameBot
             }
 
             return newGamePage;
+        }
+
+        public static string GetQuestion(HtmlDocument nextGamePage)
+        {
+            var h2Nodes = nextGamePage.DocumentNode.SelectNodes("//h2");
+            if (h2Nodes != null)
+            {
+                return h2Nodes.First().InnerText;
+            }
+            else
+            {
+                return nextGamePage.DocumentNode.SelectSingleNode("//big/b").InnerText.Split('\n').First();
+            }
         }
     }
 }

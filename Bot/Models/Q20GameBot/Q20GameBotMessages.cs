@@ -7,7 +7,7 @@ namespace Bot.Models.Q20GameBot
 {
     public static class Q20GameBotMessages
     {
-        public static string HelloMessage => "Welcome to the game '20 questions'.";
+        public static string MainMenuMessage => "Welcome to the game '20 questions'.";
         public static string ExitMessage => "Exiting current game session..."
             + Environment.NewLine
             + "Done.";
